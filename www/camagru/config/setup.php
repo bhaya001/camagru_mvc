@@ -10,17 +10,23 @@ try
                               `name` varchar(40) NOT NULL,
                               `email` varchar(255) NOT NULL UNIQUE,
                               `login` varchar(25) NOT NULL,
-                              `password` varchar(50) NOT NULL,
+                              `password` varchar(255) NOT NULL,
                               `status` int(1) NOT NULL DEFAULT 0,
-                              `token` varchar(255) NOT NULL
+                              `token` varchar(255) NOT NULL,
+                              `profile_id` int(11),
+                              `created_at` TIMESTAMP NOT NULL DEFAULT NOW(),
+                              `updated_at` TIMESTAMP NOT NULL DEFAULT NOW() ON UPDATE now()
                               ) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
     $pdo->query('ALTER TABLE `users` ADD PRIMARY KEY (`id_user`);');
     $pdo->query('ALTER TABLE `users` MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT;');
+
     $pdo->query('CREATE TABLE `images` (
                                 `id_image` int(11) NOT NULL,
                                 `link` varchar(255) NOT NULL,
-                                `publisher_id` int(11) NOT NULL
+                                `publisher_id` int(11) NOT NULL,
+                                `created_at` TIMESTAMP NOT NULL DEFAULT NOW(),
+                                `updated_at` TIMESTAMP NOT NULL DEFAULT NOW() ON UPDATE now()
                               ) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
     $pdo->query('ALTER TABLE `images` ADD PRIMARY KEY (`id_image`);');
@@ -29,9 +35,15 @@ try
                                         REFERENCES `users` (`id_user`)
                                         ON DELETE CASCADE
                                         ON UPDATE CASCADE;');
+    $pdo->query('ALTER TABLE `users` ADD FOREIGN KEY (`profile_id`)
+                                        REFERENCES `images` (`id_image`)
+                                        ON DELETE CASCADE
+                                        ON UPDATE CASCADE;');
+
     $pdo->query('CREATE TABLE `likes` (
                               `image_id` int(11) NOT NULL,
-                              `liker_id` int(11) NOT NULL
+                              `liker_id` int(11) NOT NULL,
+                              `created_at` TIMESTAMP NOT NULL DEFAULT NOW()
                             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
     $pdo->query('ALTER TABLE `likes` ADD PRIMARY KEY (`image_id`,`liker_id`);');
@@ -46,7 +58,9 @@ try
     $pdo->query('CREATE TABLE `comments` (
                               `image_id` int(11) NOT NULL,
                               `author_id` int(11) NOT NULL,
-                              `comment` text NOT NULL
+                              `comment` text NOT NULL,
+                              `created_at` TIMESTAMP NOT NULL DEFAULT NOW(),
+                              `updated_at` TIMESTAMP NOT NULL DEFAULT NOW() ON UPDATE now()
                             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
     $pdo->query('ALTER TABLE `comments` ADD PRIMARY KEY (`image_id`,`author_id`);');
@@ -60,10 +74,10 @@ try
                                         ON DELETE CASCADE
                                         ON UPDATE CASCADE;');
                                         
-  echo 'DB WAS SUCCESSFULLY INITIALIZED'.'<br>';
+  flashMessage('db_success','success','THE DATA BASE WAS INITIALIZED CORRECTLY');
 }catch(PDOException $e)
 {
-  echo 'DB WAS NOT INITIALIZED CORRECTLY'.'<br>'.$e->getMessage();
+  flasMessage('db_error','error','DB WAS NOT INITIALIZED CORRECTLY '.$e->getMessage());
   exit();
 }
 ?>

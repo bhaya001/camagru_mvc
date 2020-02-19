@@ -1,5 +1,4 @@
 <?php require ROOT.'/app/views/includes/header.php';?>
-
 <form class="box" action="" method = "post" autocomplete="off">
 <?php (isset($_SESSION['verif_success'])) ? flashMessage('verif_success','success') : '';?>
 <?php (isset($_SESSION['login_error'])) ? flashMessage('login_error','error') : '';?>
