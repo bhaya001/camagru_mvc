@@ -1,4 +1,4 @@
-<?php require ROOT.'/app/views/includes/header.php';?>
+<?php require 'app/views/includes/header.php';?>
 
 <form class="box" action="" method = "post" autocomplete="off">
 <?php (isset($_SESSION['verif_success'])) ? flashMessage('verif_success','success') : '';?>
@@ -13,4 +13,4 @@
 <input type="submit" name="submit" value="SIGN IN">
 <div class="links"><a href="<?=PROOT?>users/register">Create new Account</a>|<a href="<?=PROOT?>users/reset">Forgotten Password?</a></div>
 </form>
-<?php require ROOT.'/app/views/includes/footer.php';?>
+<?php require 'app/views/includes/footer.php';?>

@@ -1,3 +1,3 @@
-<?php require ROOT.'/app/views/includes/header.php';?>
+<?php require 'app/views/includes/header.php';?>
 
-<?php require ROOT.'/app/views/includes/footer.php';?>
+<?php require 'app/views/includes/footer.php';?>

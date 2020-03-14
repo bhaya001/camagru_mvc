@@ -11,20 +11,11 @@
           $this->_pdo = new PDO(DSN,DB_USER,DB_PASS);
         } catch (PDOException $e)
         {
-          include(ROOT .'/config/setup.php');
+          include('config/setup.php');
           $this->_pdo = $pdo;
         }
       }
-
-      // public static function getInstance()
-      // {
-      //     if(!isset(self::$_instance))
-      //         self::$_instance = new DB();
-      //     return self::$_instance;
-      // }
-
-
-
+      
       public function query($sql)
       {
           $this->_stmt = $this->_pdo->prepare($sql);

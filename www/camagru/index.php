@@ -1,16 +1,16 @@
 <?php
-  define('ROOT', dirname(__FILE__));
-  require_once(ROOT .'/config/config.php');
-  require_once(ROOT .'/app/lib/helpers/helpers.php');
-  require_once(ROOT .'/config/database.php');
+define('ROOT', dirname(__FILE__));
+  require_once('config/config.php');
+  require_once('app/lib/helpers/helpers.php');
+  require_once('config/database.php');
   function autoload($className)
   {
-    if(file_exists(ROOT .'/app/core/'.$className.'.php'))
-      require_once(ROOT .'/app/core/'.$className.'.php');
-    elseif(file_exists(ROOT .'/app/controllers/'.$className.'.php'))
-      require_once(ROOT .'/app/controllers/'.$className.'.php');
-    elseif(file_exists(ROOT .'/app/models/'.$className.'.php'))
-      require_once(ROOT .'/app/models/'.$className.'.php');
+    if(file_exists('app/core/'.$className.'.php'))
+      require_once('app/core/'.$className.'.php');
+    elseif(file_exists('app/controllers/'.$className.'.php'))
+      require_once('app/controllers/'.$className.'.php');
+    elseif(file_exists('app/models/'.$className.'.php'))
+      require_once('app/models/'.$className.'.php');
     else
       redirect('home/error404');
   }

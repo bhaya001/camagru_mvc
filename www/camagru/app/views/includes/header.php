@@ -8,8 +8,10 @@
     <link rel="stylesheet" href="<?=PROOT?>css/style.css">
   </head>
   <body>
-      <?php 
-        $src = (isset($_SESSION['user_profile'])) ? $data['profile'] : PROOT.'fonts/defaults.jpg';
+    <div class="content">
+    <?php
+        
+        $src = (isset($_SESSION['profile'])) ? PROOT.$_SESSION['profile'] : PROOT.'fonts/default.png';
       ?>
       <div class="topnav" id="myTopnav">
         <div class="navbar-left">
@@ -24,13 +26,12 @@
           <div class="dropdown">
             <button class="dropbtn"> 
               <div class="content">
-                <img src="<?=$src?>" alt="logged-in profile">
+                <img class="<?=(($data['page'] == "Settings") ?'btn-active' :'')?>" id = "menu-profile" src="<?=$src?>" alt="logged-in profile">
                 <span><?=$_SESSION['user_name']?><i class="fa fa-caret-down"></i></span>
               </div>
             </button>
             <div class="dropdown-content animate-top">
-              <a href="<?=PROOT?>users/editProfile">Edit Profile</a>
-              <a href="<?=PROOT?>users/changePassword">Change Password</a>
+              <a href="<?=PROOT?>users/settings">Settings</a>
               <a href="<?=PROOT?>users/logout">Logout</a>
             </div>
           </div> 
@@ -49,6 +50,7 @@
       </div>
       <?php (isset($_SESSION['db_success'])) ? flashMessage('db_success','success') : '';?>
       <?php (isset($_SESSION['db_error'])) ? flashMessage('db_error','error') : '';?>
+      
   
 
       

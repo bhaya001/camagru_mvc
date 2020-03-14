@@ -1,5 +1,5 @@
-<?php require ROOT.'/app/views/includes/header.php';?>
-<form class="box" action="" method = "post" autocomplete="off">
+<?php require 'app/views/includes/header.php';?>
+<form class="box register" action="" method = "post" autocomplete="off">
 <div class="row">
     <div class="group-input">
         <input type="text" name="name" class="input <?=(!empty($data['name_error'])) ? 'is-invalid' : ''?>" placeholder="Name" value="<?=$data['name']?>">
@@ -34,4 +34,4 @@
 <input type="submit" name="submit" value="SIGN UP">
 <div class="links"> <a href="<?=PROOT?>users/login">Already Member? Login</a></div>
 </form>
-<?php require ROOT.'/app/views/includes/footer.php';?>
+<?php require 'app/views/includes/footer.php';?>

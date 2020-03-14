@@ -1,4 +1,4 @@
-<?php require ROOT.'/app/views/includes/header.php';?>
+<?php require 'app/views/includes/header.php';?>
 <form class="box" action="" method = "post" autocomplete="off">
 <?php (isset($_SESSION['verif_error'])) ? flashMessage('verif_error','error') : '';?>
 <?php (isset($_SESSION['reset_error'])) ? flashMessage('reset_error','error') : '';?>
@@ -25,4 +25,4 @@
     }
 ?>
 </form>
-<?php require ROOT.'/app/views/includes/footer.php';?>
+<?php require 'app/views/includes/footer.php';?>

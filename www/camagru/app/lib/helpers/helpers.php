@@ -39,7 +39,7 @@ function isLoggedIn()
 
 function mergePics($sourcefile,$insertfile, $pos = 0)
 {
-  $dst = imagecreatefrompng(ROOT."/filters/".$insertfile.".png");
+  $dst = imagecreatefrompng("filters/".$insertfile.".png");
   $src = imagecreatefromstring($sourcefile);
 
   $srcWidth=imagesx($src);

@@ -15,6 +15,12 @@ var video = document.getElementById('cam'),
     input = document.getElementById("upload");
     form = document.getElementById('generate');
     modal = document.getElementById('snapshot'),
+    upl = document.getElementById('upload'),
+    result = document.createElement("img"),
+    message = document.createElement("div"),
+    camagru = "" , //images rendered
+    vflag = 0,// video stream flag
+    flag = 0; // upload file flag
     vendorUrl = window.URL || window.webkitURL;
 
 navigator.mediaDevices.getUserMedia({video: true, audio: false})
@@ -22,19 +28,25 @@ navigator.mediaDevices.getUserMedia({video: true, audio: false})
         video.style.display = "block";
         video.srcObject = stream;
         video.play();
+        vflag = 1;
+
     }).catch(function(err){
         console.log("Error camera");
+        flag = 1;
+        document.getElementById('viewer').style.height = "auto";
+        document.getElementById('attach').style.position = "static";
     });
 
 btn.addEventListener('click', function(){
     context = canvas.getContext('2d')
     context.filter = filter;
-    console.log(input.files[0]);
-    if(!(input.files && input.files[0]))
+    if(vflag)
         context.drawImage(video,0,0,400,300);
-    else
+    if(input.files && input.files[0])
         context.drawImage(file,0,0,400,300);
     var imgUrl = canvas.toDataURL('image/png');
+    if(!vflag && !(input.files && input.files[0]))
+        imgUrl = "";
     var feelingImg = "";
     var celebrateImg = "";
     switch(feeling)
@@ -78,90 +90,147 @@ btn.addEventListener('click', function(){
     }
     var postData = {pic:imgUrl,feeling:feelingImg,celebrate:celebrateImg};
     var dataString = "data="+JSON.stringify(postData);
-    var result = document.createElement("img");
     var ajax = new XMLHttpRequest();
     ajax.open("POST", form.getAttribute('action'), true);
     ajax.setRequestHeader("Content-type","application/x-www-form-urlencoded");
     ajax.onreadystatechange = function() {
-        if(this.readyState === 4 && this.status === 200)
+        if((this.readyState === 4 && this.status === 200))
         {
-            var now = Date.now();
-            result.setAttribute('src',this.responseText);
-            result.style.display="block";
-            document.getElementById("download").setAttribute('href',this.responseText);
-            document.getElementById("download").setAttribute('download',"camagru_"+now+".png")
-            form.appendChild(result);
+            if((feelingImg == "" && celebrateImg == "") || imgUrl == "")
+            {
+                message.setAttribute('id',"flash");
+                message.setAttribute('class',"flash error");
+                message.innerHTML = this.responseText;
+                form.appendChild(message);
+            }
+            else
+            {
+                var now = Date.now();
+                camagru = this.responseText;
+                result.setAttribute('src',camagru);
+                result.style.display="block";
+                document.getElementById("download").setAttribute('href',camagru);
+                document.getElementById("download").setAttribute('download',"camagru_"+now+".png")
+                form.appendChild(result);
+            }
         }
     };
     ajax.send(dataString);
     modal.style.display = "block";
-    close.addEventListener('click', function(){
-        video.style.display="block";
-        file.style.display = "none";
-        modal.style.display = "none";
-        input.value = null;
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        result.remove();
-    });
-    window.addEventListener('click', function(){
-        if (event.target == modal) {
-            video.style.display="block";
-            file.style.display = "none";
-            modal.style.display = "none";
-            input.value = null;
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            result.remove();
-          }
-    });
-    console.log(input.value);
 });
 
+document.getElementById("set-profile").addEventListener('click', function(){
+    dataProfile = "data="+camagru;
+    ajax = new XMLHttpRequest();
+    ajax.open("POST","/camagru/users/changeProfile", true);
+    ajax.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+    ajax.onreadystatechange = function()
+    {
+        if((this.readyState === 4 && this.status === 200))
+        {
+            document.getElementById("menu-profile").setAttribute('src',this.responseText);
+            fun_close();
+        }
+    };
+    ajax.send(dataProfile);
+});
+
+document.getElementById("save").addEventListener('click', function(){
+    dataCamagru = "data="+camagru;
+    ajax = new XMLHttpRequest();
+    ajax.open("POST","/camagru/home/save", true);
+    ajax.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+    ajax.onreadystatechange = function()
+    {
+        if((this.readyState === 4 && this.status === 200))
+        {
+            var inserted = '<div class="img-box"><img src="'+this.responseText+'" alt="" /><div class="transparent-box"><div class="caption"><p class="opacity-low">1 <i class="fa fa-heart"></i></p></div></div></div>'
+            var thumbnail = document.getElementById('thumbnail');
+            if(document.getElementById('no-pic'))
+                document.getElementById('no-pic').style.display = "none";
+            thumbnail.insertAdjacentHTML('afterbegin', inserted);
+            fun_close();
+        }
+    };
+    ajax.send(dataCamagru);
+});
+window.addEventListener('click', function(){
+    if (event.target == modal) {
+        fun_close();
+      }
+});
 filters.addEventListener('change',function(e){
     filter = e.target.value;
     video.style.filter = filter;
-    if(filter != "0" || feeling != "0"|| celebration != "0")
-        btn.disabled = false;
-    else
-        btn.disabled = true;
 });
-
+close.addEventListener('click', function(){
+    fun_close();
+});
 feelings.addEventListener('change', function(e){
     feeling = e.target.value;
-    if(filter != "0" || feeling != "0"|| celebration != "0")
-    {
-        btn.disabled = false;
-        if(!(input.value))
-            document.getElementById('face').style.display = "block";
+    
+        if((feeling != "0"|| celebration != "0") && !flag)
+        {
+            btn.disabled = false;
+            if(feeling != "0" && !(upl.files && upl.files[0]))
+                document.getElementById('face').style.display = "block";
+            else
+                document.getElementById('face').style.display = "none";
+        }
         else
+        {
+            btn.disabled = true;
             document.getElementById('face').style.display = "none";
-    }
-    else
-    {
-        btn.disabled = true;
-        document.getElementById('face').style.display = "none";
-    }
+        }
 });
 
 celebrations.addEventListener('change', function(e){
     celebration = e.target.value;
-    if(filter != "0" || feeling != "0"|| celebration != "0")
-        btn.disabled = false;
-    else
-        btn.disabled = true;
+    
+        if((feeling != "0"|| celebration != "0") && !flag)
+            btn.disabled = false;
+        else
+            btn.disabled = true;
 });
 function readURL(inp) {
-    if (inp.files && inp.files[0]) {
-      var reader = new FileReader();
-      reader.onload = function (e) {
-          file.setAttribute('src', e.target.result);
-          file.style.display = "block";
-          video.style.display = "none";
+    if (inp.files && inp.files[0])
+    { 
+        flag = 0;
+        var reader = new FileReader();
+        reader.onload = function (e) {
+        file.setAttribute('src', e.target.result);
+        file.style.display = "block";
+        video.style.display = "none";
+        document.getElementById('face').style.display = "none";
+        if(feeling != "0" || celebration != "0")
+            btn.disabled = false;
+        else
+            btn.disabled = true;
+            
       };
       reader.readAsDataURL(inp.files[0]);
     }
     else
     {
-        video.style.display = "block";
+        flag = 1;
+        file.setAttribute('src', "");
+        alert(vflag);
+        if(vflag)
+            video.style.display = "block";
         file.style.display = "none";
+        btn.disabled = true;
     }
+  }
+  function fun_close()
+  {
+    file.style.display = "none";
+    modal.style.display = "none";
+    input.value = null;
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    if(vflag)
+        video.style.display = "block";
+    else
+        btn.disabled = true;
+    result.remove();
+    message.remove();
   }

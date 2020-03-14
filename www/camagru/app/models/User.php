@@ -82,11 +82,18 @@
 
        public function resetPassword($email, $password)
        {
-        $token = randomizer();
-        $this->_db->query("UPDATE users SET password = :password, token = :token WHERE email = :email");
-        $this->_db->bind(':password', $password);
-        $this->_db->bind(':token', $token);
-        $this->_db->bind(':email', $email);
-        $this->_db->execute();
+            $token = randomizer();
+            $this->_db->query("UPDATE users SET password = :password, token = :token WHERE email = :email");
+            $this->_db->bind(':password', $password);
+            $this->_db->bind(':token', $token);
+            $this->_db->bind(':email', $email);
+            $this->_db->execute();
+       }
+       public function setProfile($id_user, $profile)
+       {
+            $this->_db->query("UPDATE users SET profile = :profile WHERE id_user = :id_user");
+            $this->_db->bind(':profile', $profile);
+            $this->_db->bind(':id_user', $id_user);
+            $this->_db->execute();
        }
     }

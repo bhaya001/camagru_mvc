@@ -6,6 +6,7 @@ class Users extends Controller
 {
   public function __construct() {
     $this->user=$this->model('User');
+    $this->image=$this->model('Image');
   }
   
   public function indexAction()
@@ -58,7 +59,7 @@ class Users extends Controller
               $_SESSION['user_id'] = $res->id_user;
               $_SESSION['user_name'] = $res->name;
               $_SESSION['user_login'] = $res->login;
-              $_SESSION['user_profile'] = $res->profile_id;
+              $_SESSION['profile'] = $res->profile;
               unset($_SESSION['csrf']);
               redirect('home/index');
             }
@@ -343,13 +344,17 @@ class Users extends Controller
     }
   }
 
-  public function editProfileAction()
+  public function settingsAction()
   {
     if(!isLoggedIn())
       redirect('home/index');
     else
     {
-      $this->view("users/edit_profile");
+      $data=[
+        'tab' => '',
+        'page'=>'Settings'
+      ];
+      $this->view("users/settings",$data);
     }
   }
 
@@ -362,6 +367,7 @@ class Users extends Controller
       if($_SERVER['REQUEST_METHOD'] == 'POST')
         {
           $data=[
+          'tab' =>'change-pass',
           'crtpassword' => trim($_POST['crtpassword']),
           'npassword' => trim($_POST['npassword']),
           'cnfpassword' => trim($_POST['cnfpassword']),
@@ -405,11 +411,31 @@ class Users extends Controller
               redirect('home');
           }
           else
-            $this->view('users/change_password', $data);  
+            $this->view('users/settings', $data);  
         }
-        else
-          $this->view("users/change_password");
     }
   }
   
+  public function changeProfileAction()
+  {
+    if(isset($_POST['data']))
+    {
+      $data = [];
+      $img = $imgString = preg_replace('/\s/', '+', $_POST['data']);
+      $uniquesavename=time().uniqid(rand());
+      $img = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $img));
+      $data['path'] = 'uploads/'.$uniquesavename.'.png';
+      
+      $data['publisher_id'] = $_SESSION['user_id'];
+      if($this->image->insertProfile($data))
+      {
+        file_put_contents($data['path'],$img);
+        $_SESSION['profile'] = $data['path'];
+        $this->user->setProfile($_SESSION['user_id'], $_SESSION['profile']);
+        echo PROOT.$data['path'];
+      }
+      else
+        echo "problem in insert";
+    }
+  }
 }
