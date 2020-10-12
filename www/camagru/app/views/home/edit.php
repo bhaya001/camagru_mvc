@@ -57,10 +57,10 @@
                 
                 
                     <div class="img-box">
-                        <img src="<?=PROOT.$value->path?>" alt="" />
+                        <img loading="lazy" src="<?=PROOT.$value->path?>" alt="" />
                             <div class="transparent-box">
                                 <div class="caption">
-                                    <p class="opacity-low">1 <i class="fa fa-heart"></i></p>
+                                    <p class="opacity-low">1 <i class="far fa-heart"></i></p>
                                 </div>
                             </div> 
                     </div>
@@ -74,7 +74,7 @@
 <div id="snapshot" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <span class="close">&times;</span>
+            <span id="close">&times;</span>
             <h2>Snapshot</h2>
         </div>
         <div id="pic-shot" class="modal-body">

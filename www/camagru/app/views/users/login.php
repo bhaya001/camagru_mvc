@@ -1,10 +1,9 @@
 <?php require 'app/views/includes/header.php';?>
-
-<form class="box" action="" method = "post" autocomplete="off">
 <?php (isset($_SESSION['verif_success'])) ? flashMessage('verif_success','success') : '';?>
 <?php (isset($_SESSION['login_error'])) ? flashMessage('login_error','error') : '';?>
 <?php (isset($_SESSION['reset_success'])) ? flashMessage('reset_success','success') : '';?>
 <?php (isset($_SESSION['register_success'])) ? flashMessage('register_success','success') : '';?>
+<form class="box" action="" method = "post" autocomplete="off">
 <input type="text" name="login" class="input <?=(!empty($data['login_error'])) ? 'is-invalid' : ''?>" placeholder="Login" value="<?=$data['login']?>">
 <span class="invalid-feedback"><?=$data['login_error']?></span>
 <input type="password" name="password" class="input <?=(!empty($data['pass_error'])) ? 'is-invalid' : ''?>" placeholder="Password">

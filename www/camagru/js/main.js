@@ -1,4 +1,8 @@
-function myFunction() {
+window.onload = function() {
+  window.setTimeout(fadeout, 5000);
+}
+
+function responsiveMenu() {
     var x = document.getElementById("myTopnav");
     var y = document.getElementById("menu");
     if(y.className === "navbar-right")
@@ -13,20 +17,9 @@ function myFunction() {
       x.className = "topnav";
     }
   }
-  var tab = document.getElementsByClassName('tab'),
-  tabContent = document.getElementsByClassName('tab-content');
 
-/* Set first tab visible */
-tab[0].classList.add('tab-active');
-tabContent[0].style.display = 'block';
-
-/* Change visible tab */
-function changetab(e, showtab) {
-  var i;
-  for (i = 0; i < tab.length; i++) {
-      tabContent[i].style.display = 'none';
-      tab[i].classList.remove('tab-active');
-  }
-  document.getElementById(showtab).style.display = 'block';
-  e.currentTarget.classList.add('tab-active');
+function fadeout() {
+  var flash = document.getElementById("flash");
+  if(flash)
+    flash.style.opacity = '0';
 }

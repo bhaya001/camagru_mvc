@@ -4,14 +4,15 @@
     <link rel="shortcut icon" href="#">
     <meta charset="utf-8">
     <title><?=SITE_TITLE?></title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/all.css">
     <link rel="stylesheet" href="<?=PROOT?>css/style.css">
   </head>
-  <body>
-    <div class="content">
+  <?php $load = "onload=\"loadtab()\"";?>
+  <body <?=(($data['page'] == "Settings") ? $load : '')?> >
+    <div class="wrapper">
     <?php
         
-        $src = (isset($_SESSION['profile'])) ? PROOT.$_SESSION['profile'] : PROOT.'fonts/default.png';
+        $src = (isset($_SESSION['user_profile'])) ? PROOT.$_SESSION['user_profile'] : PROOT.'fonts/default.png';
       ?>
       <div class="topnav" id="myTopnav">
         <div class="navbar-left">
@@ -27,7 +28,7 @@
             <button class="dropbtn"> 
               <div class="content">
                 <img class="<?=(($data['page'] == "Settings") ?'btn-active' :'')?>" id = "menu-profile" src="<?=$src?>" alt="logged-in profile">
-                <span><?=$_SESSION['user_name']?><i class="fa fa-caret-down"></i></span>
+                <span class="<?=(($data['page'] == "Settings") ?'btn-span-active' :'')?>"><?=$_SESSION['user_name']?><i class="fas fa-caret-down"></i></span>
               </div>
             </button>
             <div class="dropdown-content animate-top">
@@ -46,10 +47,13 @@
           ?>
           
         </div>
-        <a class="icon" onclick="myFunction()">&#9776;</a>
+        <a class="icon" onclick="responsiveMenu()">&#9776;</a>
       </div>
-      <?php (isset($_SESSION['db_success'])) ? flashMessage('db_success','success') : '';?>
-      <?php (isset($_SESSION['db_error'])) ? flashMessage('db_error','error') : '';?>
+      <div class="main">
+        <?php (isset($_SESSION['db_success'])) ? flashMessage('db_success','success') : '';?>
+        <?php (isset($_SESSION['db_error'])) ? flashMessage('db_error','error') : '';?>
+     
+
       
   
 

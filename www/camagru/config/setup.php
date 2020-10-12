@@ -52,6 +52,7 @@ try
                                         ON DELETE CASCADE
                                         ON UPDATE CASCADE;');
     $pdo->query('CREATE TABLE `comments` (
+                              `id_comment` int(11) NOT NULL,
                               `image_id` int(11) NOT NULL,
                               `author_id` int(11) NOT NULL,
                               `comment` text NOT NULL,
@@ -59,7 +60,8 @@ try
                               `updated_at` TIMESTAMP NOT NULL DEFAULT NOW() ON UPDATE now()
                             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;');
 
-    $pdo->query('ALTER TABLE `comments` ADD PRIMARY KEY (`image_id`,`author_id`);');
+    $pdo->query('ALTER TABLE `comments` ADD PRIMARY KEY (`id_comment`);');
+    $pdo->query('ALTER TABLE `comments` MODIFY `id_comment` int(11) NOT NULL AUTO_INCREMENT;');
     $pdo->query('ALTER TABLE `comments` ADD FOREIGN KEY (`author_id`)
                                       REFERENCES `users` (`id_user`)
                                       ON DELETE CASCADE

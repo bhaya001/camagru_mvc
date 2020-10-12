@@ -7,13 +7,29 @@
       $this->image=$this->model('Image');
     }
 
-    public function indexAction()
+    public function indexAction($page = 1)
     {
+      $num_rows = $this->image->getImagesRows();
+      $likes = [];
+      $comments = [];
+      $num_pages = ceil($num_rows / 5);
+      $start = ($page - 1) * 5;
+      $images =$this->image->getImagesPagination($start);
+      foreach ($images as $image) {
+        $likes["$image->id_image"] = $this->image->countLikes($image->id_image);
+        $comments["$image->id_image"] = $this->image->countComments($image->id_image);
+      }
       $data = [
         'page'=>"Gallery",
+        'images' => $images,
+        'num_pages' =>$num_pages,
+        'curr_page' => $page,
+        'likes' => $likes,
+        'comments'=> $comments
       ];
       $this->view('home/index', $data);
     }
+
     public function error404Action()
     {
       $this->view('404Error');
@@ -24,7 +40,7 @@
         redirect('home/index');
       else
       {
-        $images = $this->image->getImagesByPublisher($_SESSION['user_id']);
+        $images = $this->image->getImagesByPublisher($_SESSION['user_id'], 0);
         $data = [
           'page'=>"Camera",
           'images' =>$images
@@ -72,7 +88,10 @@
           echo PROOT.$data['path'];
         }
         else
-          echo "problem in insert";
+         {
+          dnd($this->image->getError());
+           echo $this->image->getError();
+         }
       }
     }
 

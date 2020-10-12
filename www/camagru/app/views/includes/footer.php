@@ -1,4 +1,3 @@
-<div class="push"></div>
 </div>
 <footer class='footer'>
     <div class="container-fluid bg-copyright">
@@ -10,6 +9,7 @@
         </div>
     </div>
 </footer>
+</div>
 <script src="<?=PROOT?>js/main.js"></script>
 
 </body>

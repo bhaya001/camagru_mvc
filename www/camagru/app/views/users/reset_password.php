@@ -1,9 +1,8 @@
 <?php require 'app/views/includes/header.php';?>
-<form class="box" action="" method = "post" autocomplete="off">
 <?php (isset($_SESSION['verif_error'])) ? flashMessage('verif_error','error') : '';?>
 <?php (isset($_SESSION['reset_error'])) ? flashMessage('reset_error','error') : '';?>
-
-
+<?php (isset($_SESSION['verif_success'])) ? flashMessage('verif_success','success') : '';?>
+<form class="box" action="" method = "post" autocomplete="off">
 <?php
     if(empty($data['token']))
     {?>
@@ -24,5 +23,6 @@
 <?php
     }
 ?>
+<input type="hidden" name="csrf" value = <?=$data['csrf']?>>
 </form>
 <?php require 'app/views/includes/footer.php';?>

@@ -2,7 +2,7 @@
 var video = document.getElementById('cam'),
     canvas = document.getElementById('canvas'),
     pic = document.getElementById('pic-shot'),
-    close = document.getElementsByClassName("close")[0];
+    close = document.getElementById('close');
     filter = "0",
     feeling = "0",
     celebration = "0",
@@ -214,7 +214,6 @@ function readURL(inp) {
     {
         flag = 1;
         file.setAttribute('src', "");
-        alert(vflag);
         if(vflag)
             video.style.display = "block";
         file.style.display = "none";
@@ -226,6 +225,7 @@ function readURL(inp) {
     file.style.display = "none";
     modal.style.display = "none";
     input.value = null;
+    flag = 1;
     context.clearRect(0, 0, canvas.width, canvas.height);
     if(vflag)
         video.style.display = "block";

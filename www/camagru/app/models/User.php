@@ -73,27 +73,42 @@
             {
                 $this->_db->query("UPDATE users SET status = 1 WHERE token = :token");
                 $this->_db->bind(':token', $token);
-                $this->_db->execute();
-                return $res;
+                if($this->_db->execute())
+                    return $res;
             }
-            else
-                return false;
+          return false;
        }
 
        public function resetPassword($email, $password)
        {
-            $token = randomizer();
-            $this->_db->query("UPDATE users SET password = :password, token = :token WHERE email = :email");
-            $this->_db->bind(':password', $password);
-            $this->_db->bind(':token', $token);
-            $this->_db->bind(':email', $email);
-            $this->_db->execute();
+          $token = randomizer();
+          $this->_db->query("UPDATE users SET password = :password, token = :token WHERE email = :email");
+          $this->_db->bind(':password', $password);
+          $this->_db->bind(':token', $token);
+          $this->_db->bind(':email', $email);
+          if($this->_db->execute())
+               return true;
+          return false;
+       }
+       public function edit($data,$id)
+       {
+          $this->_db->query("UPDATE users SET name = :name, login = :login, email = :email, profile = :profile WHERE id_user = :id");
+          $this->_db->bind(':id',$id);
+          $this->_db->bind(':name',$data['name']);
+          $this->_db->bind(':login',$data['login']);
+          $this->_db->bind(':email',$data['email']);
+          $this->_db->bind(':profile',$data['profile']);
+          if($this->_db->execute())
+               return true;
+          return false;
        }
        public function setProfile($id_user, $profile)
        {
-            $this->_db->query("UPDATE users SET profile = :profile WHERE id_user = :id_user");
-            $this->_db->bind(':profile', $profile);
-            $this->_db->bind(':id_user', $id_user);
-            $this->_db->execute();
+          $this->_db->query("UPDATE users SET profile = :profile WHERE id_user = :id_user");
+          $this->_db->bind(':profile', $profile);
+          $this->_db->bind(':id_user', $id_user);
+          if($this->_db->execute())
+               return true;
+          return false;
        }
     }

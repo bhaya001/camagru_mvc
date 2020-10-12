@@ -44,9 +44,9 @@ class Users extends Controller
           ];
 
         if(empty($data['login']))
-          $data['login_error'] = 'Please enter the login';
+          $data['login_error'] = 'Please enter your login';
         if(empty($data['password']))
-          $data['pass_error'] = 'Please enter the passord';
+          $data['pass_error'] = 'Please enter your passord';
           
         if(empty($data['login_error']) && empty($data['pass_error']))
         {
@@ -58,8 +58,9 @@ class Users extends Controller
             {
               $_SESSION['user_id'] = $res->id_user;
               $_SESSION['user_name'] = $res->name;
+              $_SESSION['user_email'] = $res->email;
               $_SESSION['user_login'] = $res->login;
-              $_SESSION['profile'] = $res->profile;
+              $_SESSION['user_profile'] = $res->profile;
               unset($_SESSION['csrf']);
               redirect('home/index');
             }
@@ -114,9 +115,9 @@ class Users extends Controller
           'page'=> 'Register'
         ];
         if(empty($data['name']))
-          $data['name_error'] = 'Please enter the name';
+          $data['name_error'] = 'Please enter your name';
         if(empty($data['email']))
-          $data['email_error'] = 'Please enter the email';
+          $data['email_error'] = 'Please enter your email';
         else
         {
           if($this->user->findByEmail($data['email']))
@@ -125,14 +126,14 @@ class Users extends Controller
             $data['email_error'] = 'Please enter a valid email'; 
         }
         if(empty($data['cemail']))
-          $data['cemail_error'] = 'Please confirm the email';
+          $data['cemail_error'] = 'Please confirm your email';
         else
         {
           if(strcmp($data['email'],$data['cemail']))
             $data['cemail_error'] = 'The emails do not match';
         }
         if(empty($data['login']))
-          $data['login_error'] = 'Please enter the login';
+          $data['login_error'] = 'Please enter your login';
         else
         {
           if(strlen($data['login']) > 8)
@@ -141,7 +142,7 @@ class Users extends Controller
             $data['login_error'] = 'This login is already used!';
         }
         if(empty($data['password']))
-          $data['pass_error'] = 'Please enter the passord';
+          $data['pass_error'] = 'Please enter your password';
         else
         {
           $reg = "/^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d])(?=.*[^A-Za-z0-9\s]).{8,}/";
@@ -149,7 +150,7 @@ class Users extends Controller
           $data['pass_error'] = 'Enter a combination of at least 8 numbers, uppercase, lowercase and special charracters (such as @,&...).';
         }
         if(empty($data['cpassword']))
-          $data['cpass_error'] = 'Please confirm the password';
+          $data['cpass_error'] = 'Please confirm your password';
         else
         {
           if(strcmp($data['password'],$data['cpassword']))
@@ -198,10 +199,7 @@ class Users extends Controller
       }
     }
   }
-  public function confirmationAction()
-  {
-    $this->view("users/confirmation");
-  }
+  
   public function verifyAction($token)
   {
     if($this->user->verify($token))
@@ -221,6 +219,8 @@ class Users extends Controller
 
   public function resetAction($token = '')
   {
+    if(empty($_SESSION['csrf'])) 
+        $_SESSION['csrf'] = hash_hmac('whirlpool', 'register', randomizer());
     if(isLoggedIn())
       redirect('home/index');
     elseif($token != '')
@@ -237,17 +237,19 @@ class Users extends Controller
       }
       else
       {
-        if($_SERVER['REQUEST_METHOD'] == 'POST')
+        if($_SERVER['REQUEST_METHOD'] == 'POST' && hash_equals($_SESSION['csrf'],$_POST['csrf']))
         {
+          $_POST=filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
           $data=[
           'token' => $token,
           'password' => trim($_POST['password']),
           'cpassword' => trim($_POST['cpassword']),
+          'csrf' => $_POST['csrf'],
           'pass_error' => '',
           'cpass_error' => '',
           ];
           if(empty($data['password']))
-            $data['pass_error'] = 'Please enter the password';
+            $data['pass_error'] = 'Please enter your password';
           else
           {
             $reg = "/^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d])(?=.*[^A-Za-z0-9\s]).{8,}/";
@@ -255,7 +257,7 @@ class Users extends Controller
             $data['pass_error'] = 'Enter a combination of at least 8 numbers, uppercase, lowercase and special charracters (such as @,&...).';
           }
           if(empty($data['cpassword']))
-            $data['cpass_error'] = 'Please confirm the password';
+            $data['cpass_error'] = 'Please confirm your password';
           else
           {
             if(strcmp($data['password'],$data['cpassword']))
@@ -268,7 +270,7 @@ class Users extends Controller
             {
               $data['password'] = hash('whirlpool', $data['password']);
               $this->user->resetPassword($_SESSION['email'], $data['password']);
-              flashMessage('reset_success', 'succes', 'Password successufly changed');
+              flashMessage('reset_success', 'succes', 'Password Successfully changed');
               redirect('users/login');
             }
             else
@@ -277,6 +279,7 @@ class Users extends Controller
               redirect('users/reset');
             }
             unset($_SESSION['time']);
+            unset($_SESSION['csrf']);
             unset($_SESSION['email']);
           }
           else
@@ -286,6 +289,7 @@ class Users extends Controller
         {
           $data=[
             'token' => $token,
+            'csrf' => $_SESSION['csrf'],
             'email' => '',
             'email_error' => ''
           ];
@@ -295,14 +299,16 @@ class Users extends Controller
     }
     else
     {  
-      if($_SERVER['REQUEST_METHOD'] == 'POST')
+      if($_SERVER['REQUEST_METHOD'] == 'POST'  && hash_equals($_SESSION['csrf'],$_POST['csrf']))
       {
+        $_POST=filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
         $data=[
           'email' => trim($_POST['email']),
+          'csrf' => $_POST['csrf'],
           'email_error' => ''
         ];
         if(empty($data['email']))
-          $data['email_error'] = 'Please enter the email';
+          $data['email_error'] = 'Please enter your email';
         else
         {
           if(!(filter_var($data['email'],FILTER_VALIDATE_EMAIL)))
@@ -321,7 +327,9 @@ class Users extends Controller
             mail($to,$subject,$message,$headers);
             $_SESSION['time'] = $_SERVER['REQUEST_TIME'];
             $_SESSION['email'] = $data['email'];
-            redirect('users/confirmation');
+            unset($_SESSION['csrf']);
+            flashMessage('verif_success', 'success', 'Please Check your email to reset your password');
+            redirect('users/reset');
           }
           else
           {
@@ -337,6 +345,7 @@ class Users extends Controller
       {
         $data=[
           'email' => '',
+          'csrf' => $_SESSION['csrf'],
           'email_error' => ''
         ];
         $this->view('users/reset_password', $data);
@@ -350,14 +359,88 @@ class Users extends Controller
       redirect('home/index');
     else
     {
+      if(empty($_SESSION['csrf'])) 
+        $_SESSION['csrf'] = hash_hmac('whirlpool', 'register', randomizer());
       $data=[
-        'tab' => '',
-        'page'=>'Settings'
+        'tab' => 'edit-profile',
+        'csrf' => $_SESSION['csrf'],
+        'page'=> 'Settings'
       ];
       $this->view("users/settings",$data);
     }
   }
 
+  public function editAction()
+  {
+    if(!isLoggedIn())
+      redirect('home/index');
+    else
+    {
+     
+      if(empty($_SESSION['csrf'])) 
+        $_SESSION['csrf'] = hash_hmac('whirlpool', 'register', randomizer());
+      if($_SERVER['REQUEST_METHOD'] == 'POST' && hash_equals($_SESSION['csrf'], $_POST['csrf']))
+      {
+        $_POST=filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+        $data=[
+          'tab' =>'edit-profile',
+          'name' => trim($_POST['name']),
+          'login' => trim($_POST['login']),
+          'email' => trim($_POST['email']),
+          'password' => trim($_POST['password']),
+          'profile' => trim($_POST['profile']),
+          'csrf' => $_POST['csrf'],
+          'name_error' => '',
+          'login_error' => '',
+          'email_error' => '',
+          'pass_error' =>''
+        ];
+       
+        if($this->user->findByEmail($data['email']) && ($data['email'] != $_SESSION['user_email']))
+            $data['email_error'] = 'This email is already used!';
+        if(!(filter_var($data['email'],FILTER_VALIDATE_EMAIL)))
+            $data['email_error'] = 'Please enter a valid email';
+        if(strlen($data['login']) > 8)
+            $data['login_error'] = 'Login must have maximum 8 characteres';
+        if($this->user->findByLogin($data['login']) && ($data['login'] != $_SESSION['user_login']))
+            $data['login_error'] = 'This login is already used!';
+        if(empty($data['password']))
+            $data['pass_error'] = 'Please enter your password';
+        else
+        {
+          $u = $this->user->getLoggedUser($_SESSION['user_id']);
+          if($u)
+          {
+            $pass = hash('whirlpool', $data['password']);
+            if((strcmp($pass,$u->password)))
+              $data['pass_error'] = 'Incorrect Password';
+          }
+        }
+        if(empty($data['name_error']) && empty($data['login_error']) && empty($data['login_error']) && empty($data['pass_error']))
+        {
+          if($this->user->edit($data, $_SESSION['user_id']))
+          {
+            $_SESSION['user_name'] =$data['name'];
+            $_SESSION['user_email'] = $data['email'];
+            $_SESSION['user_login'] =$data['login'];
+            $_SESSION['user_profile'] = $data['profile'];
+            flashMessage('edit_success', 'succes', 'Profile Updated Successfully');
+            unset($_SESSION['csrf']);
+            redirect('users/settings');
+          }
+          else
+          {
+            flashMessage('edit_error', 'error', 'Something went Wrong');
+            unset($_SESSION['csrf']);
+            redirect('users/settings');
+          }
+        }
+        else
+          $this->view('users/settings', $data);
+
+      }
+    }
+  }
   public function changePasswordAction()
   {
     if(!isLoggedIn())
@@ -366,17 +449,19 @@ class Users extends Controller
     {
       if($_SERVER['REQUEST_METHOD'] == 'POST')
         {
+          $_POST=filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
           $data=[
           'tab' =>'change-pass',
           'crtpassword' => trim($_POST['crtpassword']),
           'npassword' => trim($_POST['npassword']),
           'cnfpassword' => trim($_POST['cnfpassword']),
+          'csrf' => $_POST['csrf'],
           'crtpass_error' => '',
           'npass_error' => '',
           'cnfpass_error' => ''
           ];
           if(empty($data['crtpassword']))
-            $data['crtpass_error'] = 'Please enter the current password';
+            $data['crtpass_error'] = 'Please enter your current password';
           else
           {
             $u = $this->user->getLoggedUser($_SESSION['user_id']);
@@ -388,7 +473,7 @@ class Users extends Controller
             }
           }
           if(empty($data['npassword']))
-            $data['npass_error'] = 'Please enter the new password';
+            $data['npass_error'] = 'Please enter your new password';
           else
           {
             $reg = "/^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d])(?=.*[^A-Za-z0-9\s]).{8,}/";
@@ -397,18 +482,25 @@ class Users extends Controller
             
           }
           if(empty($data['cnfpassword']))
-            $data['cnfpass_error'] = 'Please confirm the new password';
+            $data['cnfpass_error'] = 'Please confirm your new password';
           else
           {
             if(strcmp($data['npassword'],$data['cnfpassword']))
-              $data['cpass_error'] = 'the passwords do not match';
+              $data['cnfpass_error'] = 'the passwords do not match';
           }
-          if(empty($data['crtpass_error']) && empty($data['npass_error']) && empty($data['cpass_error']))
+          if(empty($data['crtpass_error']) && empty($data['npass_error']) && empty($data['cnfpass_error']))
           {
             $npass = hash('whirlpool', $data['npassword']);
-            $this->user->resetPassword($u->email, $npass);
-            flashMessage('reset_success', 'succes', 'Password successufly changed');
-              redirect('home');
+            if($this->user->resetPassword($u->email, $npass))
+            {
+              flashMessage('reset_success', 'succes', 'Password Successfully changed');
+              unset($_SESSION['csrf']);
+              redirect('users/settings');
+            }
+            else
+            {
+              dnd($this->user->getError());
+            }
           }
           else
             $this->view('users/settings', $data);  
@@ -430,8 +522,8 @@ class Users extends Controller
       if($this->image->insertProfile($data))
       {
         file_put_contents($data['path'],$img);
-        $_SESSION['profile'] = $data['path'];
-        $this->user->setProfile($_SESSION['user_id'], $_SESSION['profile']);
+        $_SESSION['user_profile'] = $data['path'];
+        $this->user->setProfile($_SESSION['user_id'], $_SESSION['user_profile']);
         echo PROOT.$data['path'];
       }
       else
