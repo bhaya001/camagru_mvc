@@ -92,11 +92,12 @@
        }
        public function edit($data,$id)
        {
-          $this->_db->query("UPDATE users SET name = :name, login = :login, email = :email, profile = :profile WHERE id_user = :id");
+          $this->_db->query("UPDATE users SET name = :name, login = :login, email = :email, notif = :notif, profile = :profile WHERE id_user = :id");
           $this->_db->bind(':id',$id);
           $this->_db->bind(':name',$data['name']);
           $this->_db->bind(':login',$data['login']);
           $this->_db->bind(':email',$data['email']);
+          $this->_db->bind(':notif',$data['notif']);
           $this->_db->bind(':profile',$data['profile']);
           if($this->_db->execute())
                return true;

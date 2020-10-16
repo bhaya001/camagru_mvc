@@ -12,6 +12,7 @@ try
                               `login` varchar(25) NOT NULL,
                               `password` varchar(255) NOT NULL,
                               `status` int(1) NOT NULL DEFAULT 0,
+                              `notif`  int(1) NOT NULL DEFAULT 1,
                               `token` varchar(255) NOT NULL,
                               `profile` varchar(255),
                               `created_at` TIMESTAMP NOT NULL DEFAULT NOW(),

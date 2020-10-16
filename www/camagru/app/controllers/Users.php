@@ -58,6 +58,7 @@ class Users extends Controller
             {
               $_SESSION['user_id'] = $res->id_user;
               $_SESSION['user_name'] = $res->name;
+              $_SESSION['notif'] = $res->notif;
               $_SESSION['user_email'] = $res->email;
               $_SESSION['user_login'] = $res->login;
               $_SESSION['user_profile'] = $res->profile;
@@ -165,7 +166,7 @@ class Users extends Controller
           {
             $to = $data['email'];
             $subject = "Camagru Account Verification";
-            $message = "Welcome to CAMAGRU APPLICATION, Please <a href='http://localhost:8080/camagru/users/verify/".$data['token']."'>click here</a> to verify your account.";
+            $message = "Welcome to CAMAGRU APPLICATION, Please <a href='".PROOT."users/verify/".$data['token']."'>click here</a> to verify your account.";
             $headers  = 'MIME-Version: 1.0' . "\r\n";
             $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
             mail($to,$subject,$message,$headers);
@@ -321,7 +322,7 @@ class Users extends Controller
             $res = $this->user->findByEmail($data['email']);
             $to = $data['email'];
             $subject = "Camagru Reset Your Password";
-            $message = "Please <a href='http://localhost:8080/camagru/users/reset/".$res->token."'>click here</a> to reset your password";
+            $message = "Please <a href='".PROOT."users/reset/".$res->token."'>click here</a> to reset your password";
             $headers  = 'MIME-Version: 1.0' . "\r\n";
             $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
             mail($to,$subject,$message,$headers);
@@ -382,6 +383,10 @@ class Users extends Controller
       if($_SERVER['REQUEST_METHOD'] == 'POST' && hash_equals($_SESSION['csrf'], $_POST['csrf']))
       {
         $_POST=filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+        if($_POST['notif'])
+          $notif = 1;
+        else
+          $notif = 0;
         $data=[
           'tab' =>'edit-profile',
           'name' => trim($_POST['name']),
@@ -389,13 +394,13 @@ class Users extends Controller
           'email' => trim($_POST['email']),
           'password' => trim($_POST['password']),
           'profile' => trim($_POST['profile']),
+          'notif' => $notif,
           'csrf' => $_POST['csrf'],
           'name_error' => '',
           'login_error' => '',
           'email_error' => '',
           'pass_error' =>''
         ];
-       
         if($this->user->findByEmail($data['email']) && ($data['email'] != $_SESSION['user_email']))
             $data['email_error'] = 'This email is already used!';
         if(!(filter_var($data['email'],FILTER_VALIDATE_EMAIL)))
@@ -423,6 +428,7 @@ class Users extends Controller
             $_SESSION['user_name'] =$data['name'];
             $_SESSION['user_email'] = $data['email'];
             $_SESSION['user_login'] =$data['login'];
+            $_SESSION['notif'] = $data['notif'];
             $_SESSION['user_profile'] = $data['profile'];
             flashMessage('edit_success', 'succes', 'Profile Updated Successfully');
             unset($_SESSION['csrf']);

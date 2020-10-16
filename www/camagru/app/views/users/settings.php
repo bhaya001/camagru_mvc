@@ -8,7 +8,6 @@
   <nav class="tabs">
     <div class="tab<?=($data['tab'] == 'edit-profile') ? ' tab-active' : ''?>" onclick="changetab(event, 'edit-profile')">Edit Profile</div>
     <div class="tab<?=($data['tab'] == 'change-pass') ? ' tab-active' : ''?>" onclick="changetab(event, 'change-pass')">Change Password</div>
-    <div class="tab<?=($data['tab'] == 'preferences') ? ' tab-active' : ''?>" onclick="changetab(event, 'preferences')">Preferences</div>
   </nav>
   <div class="tab-content" id="edit-profile">
     <div class="header">
@@ -31,6 +30,8 @@
       <span class="invalid-feedback"><?=$data['login_error']?></span>
       <span class="for">Email</span><input type="email" name="email" class="input <?=(!empty($data['email_error'])) ? 'is-invalid' : ''?>" value="<?=(empty($data['email'])) ? $_SESSION['user_email'] : $data['email']?>">
       <span class="invalid-feedback"><?=$data['email_error']?></span>
+      <div style="margin: 20px;"><span class="for">Notifications</span><label class="container-check"><?=($_SESSION['notif']=='1') ? 'Allowed' : 'Denied'?><input id="chk_bx" name="notif" class="input" type="checkbox" <?=($_SESSION['notif']=='1') ? 'checked' : ''?> value="true"><span class="checkmark"></span></label></div>
+      <span class="invalid-feedback"></span>
       <span class="for">Password</span><input type="password" name="password" class="input <?=(!empty($data['pass_error'])) ? 'is-invalid' : ''?>" placeholder="Password">
       <span class="invalid-feedback"><?=$data['pass_error']?></span>
       <input type="hidden" name="csrf" value="<?=$data['csrf']?>">
@@ -57,15 +58,6 @@
       <input type="hidden" name="csrf" value="<?=$data['csrf']?>">
       <input type="submit" name="submit" value="Change">
     </form>
-  </div>
-  <div class="tab-content" id="preferences">
-  <div class="header">
-      <span class="icon-box">
-      <i class="fas fa-users-cog"></i>
-      </span>
-      <h2>Preferences</h2>
-    </div>
-    <p>Tab 3 Content</p>
   </div>
 </div>
 <div id="snapshot" class="modal">

@@ -187,7 +187,7 @@ feelings.addEventListener('change', function(e){
 celebrations.addEventListener('change', function(e){
     celebration = e.target.value;
     
-        if((feeling != "0"|| celebration != "0") && !flag)
+        if((feeling != "0" || celebration != "0") && !flag)
             btn.disabled = false;
         else
             btn.disabled = true;
@@ -225,7 +225,7 @@ function readURL(inp) {
     file.style.display = "none";
     modal.style.display = "none";
     input.value = null;
-    flag = 1;
+    flag = 0;
     context.clearRect(0, 0, canvas.width, canvas.height);
     if(vflag)
         video.style.display = "block";
