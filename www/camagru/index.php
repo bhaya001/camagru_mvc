@@ -12,11 +12,12 @@ define('ROOT', dirname(__FILE__));
     elseif(file_exists('app/models/'.$className.'.php'))
       require_once('app/models/'.$className.'.php');
     else
-      redirect('home/error404');
+      redirect('images/error404');
   }
   spl_autoload_register('autoload');
   session_start();
-  date_default_timezone_set('UTC');
+  chmod(ROOT."/uploads",0777);
+  date_default_timezone_set('Africa/Casablanca');
   $db = new DB();
   $url = isset($_SERVER['PATH_INFO']) ? explode('/', ltrim($_SERVER['PATH_INFO'],'/')) : [];
   Router::route($url);

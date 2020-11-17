@@ -19,7 +19,10 @@ function responsiveMenu() {
   }
 
 function fadeout() {
-  var flash = document.getElementById("flash");
-  if(flash)
-    flash.style.opacity = '0';
+  var flash = document.getElementsByClassName("flash");
+  if(flash)  
+  {
+    for (let index = 0; index < flash.length; index++)
+      flash[index].remove();
+  }
 }

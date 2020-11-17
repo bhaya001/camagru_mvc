@@ -67,6 +67,10 @@
       {
         return $this->_stmt->errorInfo();
       }
+      public function lastInsertId()
+      {
+        return $this->_pdo->lastInsertId();
+      }
 
 
   }

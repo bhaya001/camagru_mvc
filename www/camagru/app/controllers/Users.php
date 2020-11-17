@@ -8,24 +8,11 @@ class Users extends Controller
     $this->user=$this->model('User');
     $this->image=$this->model('Image');
   }
-  
-  public function indexAction()
-  {
-    if(isLoggedIn())
-    {
-      $users = $this->user->getUser($_SESSION['user_id']);
-      $data=[
-        'users' => $users,
-        'page'=>'Profile'
-      ];
-      $this->view('users/index', $data);
-    }
-  }
 
   public function loginAction()
   {
     if(isLoggedIn())
-      redirect('home/index');
+      redirect('images/gallery');
     else
     {
       if(empty($_SESSION['csrf']))
@@ -61,9 +48,10 @@ class Users extends Controller
               $_SESSION['notif'] = $res->notif;
               $_SESSION['user_email'] = $res->email;
               $_SESSION['user_login'] = $res->login;
-              $_SESSION['user_profile'] = $res->profile;
+              if($res->profile)
+                $_SESSION['user_profile'] = $res->profile;
               unset($_SESSION['csrf']);
-              redirect('home/index');
+              redirect('images/gallery');
             }
           }
           flashMessage('login_error','error', 'Login or Password invalid');
@@ -90,7 +78,7 @@ class Users extends Controller
   {
     
     if(isLoggedIn())
-      redirect('home/index');
+      redirect('images/gallery');
     else
     { 
       if(empty($_SESSION['csrf'])) 
@@ -175,7 +163,10 @@ class Users extends Controller
             redirect('users/login');
           }
           else
-            dnd($this->user->getError()); //to fix;
+          {
+            flashMessage('register_error', 'error', 'There is an error please retry later');
+            redirect('users/register');
+          }
         }
         else
           $this->view('users/register', $data);
@@ -190,6 +181,7 @@ class Users extends Controller
           'cpassword' => '',
           'name_error' => '',
           'email_error' => '',
+          'cemail_error' => '',
           'login_error' => '',
           'pass_error'=> '',
           'cpass_error' => '',
@@ -209,6 +201,7 @@ class Users extends Controller
         flashMessage('verif_success', 'success', 'This account is already verified!');
     redirect('users/login');
   }
+
   public function logoutAction()
   {
     unset($_SESSION['user_id']);
@@ -223,7 +216,7 @@ class Users extends Controller
     if(empty($_SESSION['csrf'])) 
         $_SESSION['csrf'] = hash_hmac('whirlpool', 'register', randomizer());
     if(isLoggedIn())
-      redirect('home/index');
+      redirect('images/gallery');
     elseif($token != '')
     {
       $res = $this->user->findByToken($token);
@@ -357,7 +350,7 @@ class Users extends Controller
   public function settingsAction()
   {
     if(!isLoggedIn())
-      redirect('home/index');
+      redirect('users/login');
     else
     {
       if(empty($_SESSION['csrf'])) 
@@ -365,6 +358,13 @@ class Users extends Controller
       $data=[
         'tab' => 'edit-profile',
         'csrf' => $_SESSION['csrf'],
+        'name_error' => '',
+        'email_error' => '',
+        'login_error' => '',
+        'pass_error'=> '',
+        'crtpass_error'=> '',
+        'npass_error'=> '',
+        'cnfpass_error'=> '',
         'page'=> 'Settings'
       ];
       $this->view("users/settings",$data);
@@ -374,7 +374,7 @@ class Users extends Controller
   public function editAction()
   {
     if(!isLoggedIn())
-      redirect('home/index');
+      redirect('users/login');
     else
     {
      
@@ -383,23 +383,25 @@ class Users extends Controller
       if($_SERVER['REQUEST_METHOD'] == 'POST' && hash_equals($_SESSION['csrf'], $_POST['csrf']))
       {
         $_POST=filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
+        $notif = 0;
         if($_POST['notif'])
           $notif = 1;
-        else
-          $notif = 0;
         $data=[
+          'page' => 'Settings',
           'tab' =>'edit-profile',
           'name' => trim($_POST['name']),
           'login' => trim($_POST['login']),
           'email' => trim($_POST['email']),
           'password' => trim($_POST['password']),
-          'profile' => trim($_POST['profile']),
           'notif' => $notif,
           'csrf' => $_POST['csrf'],
           'name_error' => '',
           'login_error' => '',
           'email_error' => '',
-          'pass_error' =>''
+          'pass_error' =>'',
+          'crtpass_error'=> '',
+          'npass_error'=> '',
+          'cnfpass_error'=> ''
         ];
         if($this->user->findByEmail($data['email']) && ($data['email'] != $_SESSION['user_email']))
             $data['email_error'] = 'This email is already used!';
@@ -413,7 +415,7 @@ class Users extends Controller
             $data['pass_error'] = 'Please enter your password';
         else
         {
-          $u = $this->user->getLoggedUser($_SESSION['user_id']);
+          $u = $this->user->getUserById($_SESSION['user_id']);
           if($u)
           {
             $pass = hash('whirlpool', $data['password']);
@@ -447,30 +449,36 @@ class Users extends Controller
       }
     }
   }
+
   public function changePasswordAction()
   {
     if(!isLoggedIn())
-      redirect('home/index');
+      redirect('users/login');
     else
     {
       if($_SERVER['REQUEST_METHOD'] == 'POST')
         {
           $_POST=filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
           $data=[
-          'tab' =>'change-pass',
+          'page' => 'Settings',
+          'tab' => 'change-pass',
           'crtpassword' => trim($_POST['crtpassword']),
           'npassword' => trim($_POST['npassword']),
           'cnfpassword' => trim($_POST['cnfpassword']),
           'csrf' => $_POST['csrf'],
           'crtpass_error' => '',
           'npass_error' => '',
-          'cnfpass_error' => ''
+          'cnfpass_error' => '',
+          'name_error' => '',
+          'login_error' => '',
+          'email_error' => '',
+          'pass_error' =>''
           ];
           if(empty($data['crtpassword']))
             $data['crtpass_error'] = 'Please enter your current password';
           else
           {
-            $u = $this->user->getLoggedUser($_SESSION['user_id']);
+            $u = $this->user->getUserById($_SESSION['user_id']);
             if($u)
             {
               $pass = hash('whirlpool', $data['crtpassword']);
@@ -516,24 +524,80 @@ class Users extends Controller
   
   public function changeProfileAction()
   {
-    if(isset($_POST['data']))
+    if(!(isLoggedIn()) || !(isset($_POST['data'])))
+          redirect('images/gallery');
+    else
     {
-      $data = [];
-      $img = $imgString = preg_replace('/\s/', '+', $_POST['data']);
-      $uniquesavename=time().uniqid(rand());
-      $img = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $img));
-      $data['path'] = 'uploads/'.$uniquesavename.'.png';
-      
-      $data['publisher_id'] = $_SESSION['user_id'];
-      if($this->image->insertProfile($data))
+      $decoded = json_decode($_POST['data']);
+      if(hash_equals($_SESSION['csrf'],$decoded->csrf))
       {
-        file_put_contents($data['path'],$img);
-        $_SESSION['user_profile'] = $data['path'];
-        $this->user->setProfile($_SESSION['user_id'], $_SESSION['user_profile']);
-        echo PROOT.$data['path'];
+        $data = [];
+        $img = preg_replace('/\s/', '+', $decoded->img);
+        $uniquesavename=time().uniqid(rand());
+        $img = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $img));
+        $data['path'] = 'uploads/'.$uniquesavename.'.png';
+        
+        $data['publisher_id'] = $_SESSION['user_id'];
+        if($this->image->insertProfile($data))
+        {
+          $_SESSION['csrf'] = hash_hmac('whirlpool', 'profile', randomizer());
+          file_put_contents($data['path'],$img);
+          $_SESSION['user_profile'] = $data['path'];
+          $this->user->setProfile($_SESSION['user_id'], $_SESSION['user_profile']);
+          $response = [
+            'image' => PROOT.$data['path'],
+            'message' => 'Profile photo changed',
+            'csrf' => $_SESSION['csrf']
+          ];
+        }
+        else
+          $response = [
+            'image' => '',
+            'message' => 'There is a probleme please try later',
+            'csrf' => ''
+          ];
       }
       else
-        echo "problem in insert";
+        $response = [
+          'image' => '',
+          'message' => '502 Internal Error Server',
+          'csrf' => ''
+        ];
+      echo json_encode($response);
     }
   }
+
+  public function deleteProfileAction()
+  {
+  
+    if(!(isLoggedIn()) || !(isset($_POST['data'])))
+          redirect('images/gallery');
+    else
+    {
+      if(hash_equals($_SESSION['csrf'],$_POST['data']))
+      {
+        if($this->image->deleteProfile($_SESSION['user_id']) && $this->user->defaultProfile($_SESSION['user_id']))
+        {
+          $_SESSION['csrf'] = hash_hmac('whirlpool', 'profile', randomizer());
+          unset($_SESSION['user_profile']);
+          $response = [
+            'message' => "Profile photo removed",
+            'csrf' => $_SESSION['csrf']
+          ];
+        }
+        else
+          $response=[
+            'message' => "There is an error please try later",
+            'csrf' => ''
+          ];
+      }
+      else
+        $response = [
+          'message' => "502 Internal Server Error",
+          'csrf' => ""
+        ];
+      echo json_encode($response);
+    }
+  }
+
 }

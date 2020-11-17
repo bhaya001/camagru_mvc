@@ -22,7 +22,7 @@
             else
                 return false;
        }
-       public function getLoggedUser($id)
+       public function getUserById($id)
        {
            $this->_db->query("SELECT * FROM users WHERE id_user = :id");
            $this->_db->bind(':id',$id);
@@ -92,13 +92,12 @@
        }
        public function edit($data,$id)
        {
-          $this->_db->query("UPDATE users SET name = :name, login = :login, email = :email, notif = :notif, profile = :profile WHERE id_user = :id");
+          $this->_db->query("UPDATE users SET name = :name, login = :login, email = :email, notif = :notif WHERE id_user = :id");
           $this->_db->bind(':id',$id);
           $this->_db->bind(':name',$data['name']);
           $this->_db->bind(':login',$data['login']);
           $this->_db->bind(':email',$data['email']);
           $this->_db->bind(':notif',$data['notif']);
-          $this->_db->bind(':profile',$data['profile']);
           if($this->_db->execute())
                return true;
           return false;
@@ -112,4 +111,13 @@
                return true;
           return false;
        }
+     public function defaultProfile($id_user)
+       {
+          $this->_db->query("UPDATE users SET profile = '' WHERE id_user = :id_user");
+          $this->_db->bind(':id_user', $id_user);
+          if($this->_db->execute())
+               return true;
+          return false;
+       }
+       
     }

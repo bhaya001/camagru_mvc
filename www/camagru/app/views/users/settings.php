@@ -10,16 +10,26 @@
     <div class="tab<?=($data['tab'] == 'change-pass') ? ' tab-active' : ''?>" onclick="changetab(event, 'change-pass')">Change Password</div>
   </nav>
   <div class="tab-content" id="edit-profile">
-    <div class="header">
-      
-      <div class="img-box img-setting">
-        <img class="edit-profile-img" src="<?=(isset($_SESSION['user_profile'])) ? PROOT.$_SESSION['user_profile'] : PROOT.'fonts/default.png'?>" alt="">
-        <div id="edit-profile-pic" class="transparent-box trans-setting">
-          <div class="caption caption-setting">
-            <p class="opacity-low"><i class="fas fa-edit"></i></p>
-          </div>
-        </div> 
+    <div id ="head" class="header">
+    <?php if(isset($_SESSION['user_profile'])):?>
+      <div id="img-box" class="img-box img-setting">
+        <a onclick="openpopup(event)"><img class="edit-profile-img" src="<?=PROOT.$_SESSION['user_profile']?>" alt="">
+          <span id="action-profile" class="popup-action">
+            <i id="del-profile" class="fas fa-trash" onclick="deleteProfile(event)"></i>
+            <i id="edit-profile" class="fas fa-edit" onclick="editProfile(event)"></i>
+          </span>
+        </a>
       </div>
+    <?php else:?>
+        <span class="profile-setting">
+          <i onclick="openpopup(event)" class="icon fas fa-user-circle">
+            <span id="action-profile" class="popup-action">
+              <i id="edit-profile" class="fas fa-edit" onclick="editProfile(event)"></i>
+            </span>
+          </i>
+        </span>
+    <?php endif;?>
+      
       <h2>Edit Profile</h2>
     </div>
     
@@ -34,8 +44,7 @@
       <span class="invalid-feedback"></span>
       <span class="for">Password</span><input type="password" name="password" class="input <?=(!empty($data['pass_error'])) ? 'is-invalid' : ''?>" placeholder="Password">
       <span class="invalid-feedback"><?=$data['pass_error']?></span>
-      <input type="hidden" name="csrf" value="<?=$data['csrf']?>">
-      <input type="hidden" name="profile" value="<?=$_SESSION['user_profile']?>">
+      <input id='csrf' type="hidden" name="csrf" value="<?=$data['csrf']?>">
       <input type="button"  onclick="window.location.href='<?=PROOT?>users/settings'" value="Cancel">
       <input type="submit" name="submit" value="Edit">
     </form>
@@ -44,7 +53,7 @@
   
     <div class="header">
       <span class="icon-box">
-        <i class="fas fa-user-lock"></i>
+        <i class="fas fa-cogs"></i>
       </span>
       <h2>Change Password</h2>
     </div>
@@ -59,23 +68,6 @@
       <input type="submit" name="submit" value="Change">
     </form>
   </div>
-</div>
-<div id="snapshot" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <span id="close">&times;</span>
-            <h2>Snapshot</h2>
-        </div>
-        <div class="modal-body">
-        <img src="<?=(isset($_SESSION['user_profile'])) ? PROOT.$_SESSION['user_profile'] : PROOT.'fonts/default.png'?>" style="display:block;" alt="">
-        </div>
-        <div class="modal-footer">
-            <h3>Actions</h3>
-            <img id="save" class="btn btn-right" src="<?=PROOT?>fonts/send.png" title="save picture">
-            <a id ="download" download="" href=""><img  class="btn btn-right" src="<?=PROOT?>fonts/download.png" title="Download Picture"></a>
-            <img id="set-profile" class="btn btn-right" src="<?=PROOT?>fonts/profile.png" title="Make as Profile">
-        </div>
-    </div>
 </div>
 <script src="<?=PROOT?>js/settings.js"></script>
 <?php require 'app/views/includes/footer.php';?>

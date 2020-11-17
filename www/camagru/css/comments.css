@@ -1,0 +1,172 @@
+@import url(//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css);
+.detailBox {
+    width:360px;
+    margin-top: 20px;
+}
+.titleBox {
+    padding: 10px;
+    width: 100px;
+    margin-bottom: 20px;
+}
+.titleBox label{
+  color:#444;
+  margin:0;
+  display:inline-block;
+}
+
+.commentBox {
+    padding:10px;
+    border-top:1px solid #444;
+}
+.commentBox .form-group:first-child, .form-group:first-child {
+    width:80%;
+}
+.commentBox .form-group:nth-child(2), .form-group:nth-child(2) {
+    width:18%;
+}
+.form-group{
+    display: inline-block;
+}
+.form-group .form-control{
+    width:100%;
+    margin: 10px;
+}
+ .form-group a {
+    
+    text-decoration: none;
+    color: #ef6550;
+    opacity: 0.5;
+    margin-left: 15px;
+    cursor: default;
+    font-weight:bold;
+}
+.taskDescription {
+    display: inline;
+    position: relative;
+}
+.commentList {
+    padding:0;
+    list-style:none;
+    height:200px;
+    overflow:auto;
+}
+
+.commentList li {
+    position: relative;
+    margin-top:15px;
+}
+.likerList{
+    padding: 0;
+    list-style: none;
+    height: 200px;
+    overflow: auto;
+}
+.likerList li {
+    margin: 0px 15px 25px 0px;
+    position: relative;
+}
+
+
+.commentList li > div {
+    display:table-cell;
+}
+.likerList > div{
+    display: contents;
+}
+.commenterImage {
+    margin-right:5px;
+    height:100%;
+    float:left;
+}
+.commenterImage img {
+    width:40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius:50%;
+}
+
+.commenterImage i{
+    font-size: 40px;
+}
+
+.commentText{
+    width: 220px;
+}
+.comment-action{
+    position: absolute;
+    top: 0;
+    right: 30px;
+    color: #444444;
+}
+.comment-action i{
+    position: relative;
+    display: inline-block;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: pointer;
+}
+
+.user-posts{
+    color: #f06450;
+    float: right;
+    position: absolute;
+    right: 0px;
+    top: 25%;
+}
+.user-posts:hover{
+    color: #f06450;
+}
+
+.commentText p {
+    margin:0;
+    word-break: break-word;
+}
+.comment-value{
+    display: inline;
+}
+.sub-text {
+    color:#aaa;
+    font-family:verdana;
+    font-size:11px;
+    display: block;
+}
+.actionBox {
+    border-top:1px solid #444;
+    padding:10px;
+}
+.form-control:hover {
+    border-color: #ef6550;
+ }
+ 
+ .form-control:focus {
+    border-color: #ef6550;
+ }
+ #editBtn{
+     display: none;
+ }
+ #cancelEdit{
+     display: none;
+ }
+ .footer p{
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+ }
+ .footer a:hover
+ {
+    text-decoration: none;
+    color: #ef6550;
+ }
+
+ .footer {
+    height: 5.5rem;
+ }
+
+a:hover
+{
+    text-decoration: none;
+}

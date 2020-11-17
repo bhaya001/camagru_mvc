@@ -1,4 +1,5 @@
 <?php require 'app/views/includes/header.php';?>
+<?php (isset($_SESSION['register_error'])) ? flashMessage('register_error','error') : '';?>
 <form class="box register" action="" method = "post" autocomplete="off">
 <div class="row">
     <div class="group-input">
